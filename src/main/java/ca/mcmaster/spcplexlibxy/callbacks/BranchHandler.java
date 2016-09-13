@@ -233,7 +233,7 @@ public class BranchHandler extends IloCplex.BranchCallback{
     }
     
     private boolean farmingCondition() throws IloException{
-        if( !startFarmingFlag && getNremainingNodes64() > MAXIMUM_LEAF_NODES_PER_SUB_TREE){
+        if( !startFarmingFlag && getNremainingNodes64() >= MAXIMUM_LEAF_NODES_PER_SUB_TREE){
             startFarmingFlag=true;
         } else if (startFarmingFlag && getNremainingNodes64() <MINIMUM_LEAF_NODES_PER_SUB_TREE){
             startFarmingFlag=false;

@@ -30,7 +30,7 @@ public class Parameters implements Serializable{
     public static int  MINIMUM_LEAF_NODES_PER_SUB_TREE  =  MAXIMUM_LEAF_NODES_PER_SUB_TREE/TWO; 
     public final static int  MAXIMUM_LEAF_NODES_PER_SUB_TREE_RAMPUP  =   NUM_PARTITIONS*FOUR; 
     public final static int  MINIMUM_LEAF_NODES_PER_SUB_TREE_RAMPUP  =   ZERO;
-    public final static int  MAXIMUM_LEAF_NODES_PER_SUB_TREE_REGULAR  =  TEN*TWO; 
+    public final static int  MAXIMUM_LEAF_NODES_PER_SUB_TREE_REGULAR  =  TWO; 
     public final static int  MINIMUM_LEAF_NODES_PER_SUB_TREE_REGULAR  =  ZERO;
                                                                     
     
@@ -43,7 +43,7 @@ public class Parameters implements Serializable{
     
     //limit the number of Iloclex objects in any partition
     //Do not create new ones if this many already active
-    public  static final  int MAX_ACTIVE_SUBTREES  =     FOUR; 
+    public  static final  int MAX_ACTIVE_SUBTREES  =     ONE; 
         
     //search strategy
     public static final int DepthFirst= ZERO;

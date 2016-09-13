@@ -198,6 +198,8 @@ public class ActiveSubtreeCollection  {
         logger.info(" iteration "+ iteratioNumber + " ,subtree collection " + partitionNumber +
                 " ,solve Started at  " + Instant.now() + " will end at "+ endTimeOnWorkerMachine);
         
+        printRawnodeLPRelaxVals();
+        
         double timeSliceForPartition = Duration.between(Instant.now(), endTimeOnWorkerMachine).toMillis()/THOUSAND;
         this.totalTimeAllocatedForSolving += timeSliceForPartition;
                
@@ -263,6 +265,7 @@ public class ActiveSubtreeCollection  {
         this.totalTimeUsedForSolving +=(timeSliceForPartition-timeWasted);
         
         logger.info(" iteration "+ iteratioNumber + " ,subtree collection " + partitionNumber +" ,solve Ended at  " + Instant.now());
+        printRawnodeLPRelaxVals();
         return this.bestKnownLocalSolution;
         
     }//end solve
@@ -312,6 +315,7 @@ public class ActiveSubtreeCollection  {
         
         //default is to solve nothing
         int result = -ONE;
+        double lpRelaxValueOfWorkItem = ZERO;
         
         //enumerate the cases  
                 
@@ -322,6 +326,7 @@ public class ActiveSubtreeCollection  {
             //pick the tree we should solve next 
             if (this.activeSubtreeList.size()>ZERO){            
                 result = getTreeIndexWithBestObjective();
+                lpRelaxValueOfWorkItem= activeSubtreeList.get(result).getBestObjValue(); 
             }
                     
             //if MAX_ACTIVE_SUBTREES limit not yet hit on this partition , may  pick one of the raw nodes
@@ -330,15 +335,18 @@ public class ActiveSubtreeCollection  {
                 bestRawNodeIndex = getRawNodeIndexWithBestObjective();
                 if (bestRawNodeIndex >= ZERO && shouldPromoteBestRawNodeToTree (result, bestRawNodeIndex))  {
                                              
+                    lpRelaxValueOfWorkItem=  rawNodeList.get(bestRawNodeIndex).getLpRelaxValue();
+                            
                     // promote it to tree and pick it
                     activeSubtreeList.add(new ActiveSubtree(this.rawNodeList.remove(bestRawNodeIndex)));
                     result = this.activeSubtreeList.size()-ONE;
+                   
                 }
             }  
             
-            
+             
         }
-        
+        if(result >=ZERO)logger.debug(" Solve node with lp relax " +lpRelaxValueOfWorkItem);
         return result;
     }
     
@@ -427,5 +435,18 @@ public class ActiveSubtreeCollection  {
         return removedTrees;
     }
            
+    private List<Double> printRawnodeLPRelaxVals(){
+        List<Double> vals = new ArrayList<Double>();
+        for(int index= ZERO; index < this.rawNodeList.size(); index++){
+            vals.add(rawNodeList.get(index).getLpRelaxValue());
+        }
+        Collections.sort(vals);
+        logger.debug("________________ printing lp relax vals:");
+        for(int index= ZERO; index < this.rawNodeList.size(); index++){
+            logger.debug(vals.get(index));
+        }
+        logger.debug("----------------");
+        return vals;
+    }
 
 }
