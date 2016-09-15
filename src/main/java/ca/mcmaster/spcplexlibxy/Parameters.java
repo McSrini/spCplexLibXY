@@ -30,7 +30,7 @@ public class Parameters implements Serializable{
     public static int  MINIMUM_LEAF_NODES_PER_SUB_TREE  =  MAXIMUM_LEAF_NODES_PER_SUB_TREE/TWO; 
     public final static int  MAXIMUM_LEAF_NODES_PER_SUB_TREE_RAMPUP  =   NUM_PARTITIONS*FOUR; 
     public final static int  MINIMUM_LEAF_NODES_PER_SUB_TREE_RAMPUP  =   ZERO;
-    public final static int  MAXIMUM_LEAF_NODES_PER_SUB_TREE_REGULAR  =  TWO; 
+    public final static int  MAXIMUM_LEAF_NODES_PER_SUB_TREE_REGULAR  =  TEN*TEN*THOUSAND; //no limit
     public final static int  MINIMUM_LEAF_NODES_PER_SUB_TREE_REGULAR  =  ZERO;
                                                                     
     

@@ -42,6 +42,7 @@ public class BranchHandler extends IloCplex.BranchCallback{
     
     //best known optimum is used to prune nodes
     private double bestKnownOptimum;
+    private double nextBestLPRelax;
     
     private boolean startFarmingFlag = false;
      
@@ -63,9 +64,9 @@ public class BranchHandler extends IloCplex.BranchCallback{
         this.  treeMetaData= metaData;       
     }
      
-    public void refresh( double bestKnownOptimum) {
+    public void refresh( double bestKnownOptimum, double nextBestLPRelax) {
         this.bestKnownOptimum=bestKnownOptimum;
-      
+        this.nextBestLPRelax = nextBestLPRelax;
     } 
   
     /**
@@ -238,6 +239,14 @@ public class BranchHandler extends IloCplex.BranchCallback{
         } else if (startFarmingFlag && getNremainingNodes64() <MINIMUM_LEAF_NODES_PER_SUB_TREE){
             startFarmingFlag=false;
         }
+        
+        //also set farming flag if best obj val becomes inferior to next item waiting in line
+        if(IS_MAXIMIZATION &&( nextBestLPRelax> getBestObjValue())){
+            startFarmingFlag=true;
+        } else if (!IS_MAXIMIZATION && (nextBestLPRelax< getBestObjValue())) {
+            startFarmingFlag=true;
+        }
+        
         return startFarmingFlag;
     }
     

@@ -228,7 +228,7 @@ public class ActiveSubtreeCollection  {
             
             //pick a tree to solve and solve it for MIN_SOLUTION_TIME_SLICE_IN_SECONDS   
             int treeSelectedForSolution = getIndexOfTreeToSolve();
-            
+            double secondBestLPRelaxVal = getSecondBestLPRelaxValue();
             
             
             if (treeSelectedForSolution>=ZERO) {
@@ -239,8 +239,8 @@ public class ActiveSubtreeCollection  {
                 logger.debug(" Subtree collection has this many  trees " + this.getNumberOFTrees()+" and raw nodes"+this.getRawNodesCount() );
                 
                 int solutionTimeSlice = (iteratioNumber==ZERO)? RAMPUP_SOLN_TIME_SLICE_IN_SECONDS : SOLN_TIME_SLICE_PER_SUBTREE_IN_SECONDS;
-                boolean betterSolutionFound = solve(  subtree, (int)Math.min(Math.round(wallClockTimeLeft),solutionTimeSlice ) ,   iteratioNumber);   
-
+                boolean betterSolutionFound = solve(  subtree, (int)Math.min(Math.round(wallClockTimeLeft),solutionTimeSlice ) ,   
+                        iteratioNumber, secondBestLPRelaxVal);   
                 
                 if ( subtree.isDiscardable() || subtree.isSolvedToCompletion() || subtree.isInferior( bestKnownLocalOptimum) ) {
                     if (subtree.isDiscardable()) logger.debug(" tree discarded "+subtree.getGUID());
@@ -270,7 +270,7 @@ public class ActiveSubtreeCollection  {
         
     }//end solve
     
-    private boolean solve(ActiveSubtree subtree , int  timeSliceInSeconds, int iteratioNumber) throws Exception{
+    private boolean solve(ActiveSubtree subtree , int  timeSliceInSeconds, int iteratioNumber,   double nextBestLPRelax  ) throws Exception{
         
         boolean hasBetterSolutionBeenFound = false;
         
@@ -285,7 +285,7 @@ public class ActiveSubtreeCollection  {
         logger.debug("raw node count before solve is " + this.rawNodeList.size());
         logger.debug(" solving "+subtree.getGUID() );
          
-        subtree.solve(timeSliceInSeconds , bestKnownLocalOptimum);
+        subtree.solve(timeSliceInSeconds , bestKnownLocalOptimum, nextBestLPRelax);
         
         Solution subTreeSolution = subtree.getSolution() ;
         if ( ZERO != (new SolutionComparator()).compare(bestKnownLocalSolution, subTreeSolution)){
@@ -309,6 +309,32 @@ public class ActiveSubtreeCollection  {
     }
   
  
+    private double getSecondBestLPRelaxValue() throws IloException{
+        List<Double> lpRelaxList = new ArrayList<Double> ();
+        double result = ZERO;
+        
+        if(  this.activeSubtreeList.size()+ this.rawNodeList.size()<TWO  ){
+        
+            //
+            result = IS_MAXIMIZATION? Double.MIN_VALUE :Double.MAX_VALUE;
+        }else {
+            //collect all relaxed values into a list
+            for(NodeAttachment node : rawNodeList){
+                lpRelaxList.add(node.getLpRelaxValue());
+            }
+            
+            for(ActiveSubtree tree :activeSubtreeList){
+                lpRelaxList.add(tree.getBestObjValue());
+            }
+            
+            Collections.sort(lpRelaxList);
+            if (IS_MAXIMIZATION) Collections.reverse(lpRelaxList);
+
+            result = lpRelaxList.get(ONE);
+        }
+        
+        return result;
+    }
     
     //pick a tree to solve
     private int getIndexOfTreeToSolve () throws  Exception{

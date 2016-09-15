@@ -102,11 +102,11 @@ public class ActiveSubtree   {
      * Solve this subtree for some time
      * Subtree meta data will be updated by the solver.
      */
-    public IloCplex.Status solve ( double timeSliceInSeconds,         double bestKnownOptimum )
+    public IloCplex.Status solve ( double timeSliceInSeconds,         double bestKnownOptimum  , double nextBestLPRelax )
             throws  Exception {
          
         //solve for some time
-        IloCplex.Status  status = solver.solve( timeSliceInSeconds, bestKnownOptimum );
+        IloCplex.Status  status = solver.solve( timeSliceInSeconds, bestKnownOptimum  ,   nextBestLPRelax );
         
         return status;
         

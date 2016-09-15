@@ -3,6 +3,7 @@ package ca.mcmaster.spcplexlibxy.solver;
 import static ca.mcmaster.spcplexlibxy.Constants.*;
 import static ca.mcmaster.spcplexlibxy.Parameters.*;
 import ca.mcmaster.spcplexlibxy.callbacks.BranchHandler;
+import ca.mcmaster.spcplexlibxy.callbacks.NodeHandler;
 import ca.mcmaster.spcplexlibxy.datatypes.*;
 import ilog.concert.IloException;
 import ilog.concert.IloLPMatrix;
@@ -29,7 +30,7 @@ public class Solver   {
         this.  treeMetaData=  metaData;
         
         branchHandler = new BranchHandler(      metaData   );
-        //nodeHandler = new  NodeHandler (    metaData) ;
+        //NodeHandler nodeHandler = new  NodeHandler (    ) ;
         
         this.cplex.use(branchHandler);
         //this.cplex.use(nodeHandler);   
@@ -57,13 +58,13 @@ public class Solver   {
         return this.treeMetaData.isEntireTreeDiscardable();
     }
     
-    public IloCplex.Status solve(double timeSliceInSeconds,     double bestKnownGlobalOptimum   ) 
+    public IloCplex.Status solve(double timeSliceInSeconds,     double bestKnownGlobalOptimum  , double nextBestLPRelax ) 
             throws  Exception{
         
         
         //can we supply MIP  start along with bestKnownGlobalOptimum ?         
        
-        branchHandler.refresh(bestKnownGlobalOptimum);  
+        branchHandler.refresh(bestKnownGlobalOptimum,    nextBestLPRelax);  
         //nodeHandler.setTimeSlice(timeSliceInSeconds);
        
         cplex.setParam(IloCplex.Param.TimeLimit, timeSliceInSeconds); 
